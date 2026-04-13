@@ -21,7 +21,8 @@ Assignly is a cross-platform mobile app built with React Native and Expo that he
 - Expo Notifications
 
 ## Screenshots
-_Add screenshots here_
+Check screenshots folder
+
 
 ## Running Locally
 ```bash
