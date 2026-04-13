@@ -1,0 +1,31 @@
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+.expo-shared/
+
+# build output
+dist/
+web-build/
+
+# environment variables
+.env
+.env.*
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# macOS
+.DS_Store
+
+# certificates / secrets
+*.p8
+*.p12
+*.mobileprovision
+
+# native folders (Expo managed)
+ios/
+android/
