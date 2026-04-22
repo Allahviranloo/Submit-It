@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "assignly",
-    "slug": "assignly",
+    "name": "Submit-It",
+    "slug": "Submit-It",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "scheme": "assignly",
+    "scheme": "Submit-It",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.sahandallahviranlou.assignly",
+      "bundleIdentifier": "com.sahandallahviranlou.Submit-It",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
