@@ -1,6 +1,6 @@
-# Assignly
+# Submit-It
 
-Assignly is a cross-platform mobile app built with React Native and Expo that helps students organize courses, track assignments, manage deadlines, and receive reminder notifications.
+Submit-It is a cross-platform mobile app built with React Native and Expo that helps students organize courses, track assignments, manage deadlines, and receive reminder notifications.
 
 ## Features
 - Course creation and color coding
