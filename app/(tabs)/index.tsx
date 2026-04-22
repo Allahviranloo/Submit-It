@@ -164,8 +164,8 @@ export default function DashboardScreen() {
         contentContainerStyle={styles.container}
         ListHeaderComponent={
           <>
-            <Text style={styles.title}>Assignly</Text>
-            <Text style={styles.subtitle}>Miss assignemnts rarely with Assignly.</Text>
+            <Text style={styles.title}>Submit-It</Text>
+            <Text style={styles.subtitle}>Why forget it? Just Submit-It.</Text>
 
             {renderAssignmentCard('Due Today', dueToday, 'No assignments due today')}
             {renderAssignmentCard('Upcoming', upcoming, 'No upcoming assignments')}
