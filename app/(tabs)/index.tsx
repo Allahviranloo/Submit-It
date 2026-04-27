@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAppData } from '../../context/AppDataContext';
 import { COLORS } from '../../constants/website-colors';
 import AnimatedCard from '../../components/card-animation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import GuideModal from '../../components/GuideModal';
 
 export default function DashboardScreen() {
   const { assignments, courses } = useAppData();
@@ -99,6 +101,25 @@ export default function DashboardScreen() {
         getAssignmentDateTime(b.dueDate, b.dueTime).getTime()
     );
 
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    const checkGuide = async () => {
+      const hasSeenGuide = await AsyncStorage.getItem('hasSeenDashboardGuide');
+
+      if (!hasSeenGuide) {
+        setShowGuide(true);
+      }
+    };
+
+    void checkGuide();
+  }, []);
+
+  const closeGuide = async () => {
+    await AsyncStorage.setItem('hasSeenDashboardGuide', 'true');
+    setShowGuide(false);
+  };
+
   const renderAssignmentCard = (
     title: string,
     items: typeof assignments,
@@ -157,6 +178,14 @@ export default function DashboardScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <GuideModal
+        visible={showGuide}
+        title="Welcome to your Dashboard"
+        message="This page shows your assignments grouped by due today, upcoming, overdue, and submitted work so you can quickly see what needs attention."
+        onClose={() => {
+          void closeGuide();
+        }}
+      />
       <FlatList
         data={[]}
         renderItem={null}

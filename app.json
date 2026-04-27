@@ -4,12 +4,12 @@
     "slug": "Submit-It",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Icon.png",
     "scheme": "Submit-It",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "com.sahandallahviranlou.Submit-It",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
@@ -56,12 +56,12 @@
       "typedRoutes": true,
       "reactCompiler": true
     },
+    "owner": "thelategamer",
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "a977dd82-6466-46d3-b01e-3d92b536cc6f"
+        "projectId": "5df17713-72db-4aea-95c9-f475ced57360"
       }
-    },
-    "owner": "thelategamer"
+    }
   }
 }

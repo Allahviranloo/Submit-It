@@ -15,11 +15,11 @@ export default function AnimatedCard({
   delay = 0,
 }: AnimatedCardProps) {
   const opacity = useSharedValue(0);
-  const translateY = useSharedValue(12);
+  const translateY = useSharedValue(18);
 
   useEffect(() => {
-    opacity.value = withTiming(1, { duration: 280 });
-    translateY.value = withTiming(0, { duration: 280 });
+    opacity.value = withTiming(1, { duration: 420 });
+    translateY.value = withTiming(0, { duration: 420 });
   }, [opacity, translateY]);
 
   const animatedStyle = useAnimatedStyle(() => ({

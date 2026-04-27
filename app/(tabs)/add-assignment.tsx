@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -16,6 +16,8 @@ import { router } from 'expo-router';
 import { useAppData } from '../../context/AppDataContext';
 import { COLORS } from '../../constants/website-colors';
 import AnimatedCard from '../../components/card-animation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import GuideModal from '../../components/GuideModal';
 
 export default function AddAssignmentScreen() {
   const { courses, assignments, addAssignment, deleteAssignment } = useAppData();
@@ -164,6 +166,25 @@ export default function AddAssignmentScreen() {
     setCourseModalVisible(false);
   };
 
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    const checkGuide = async () => {
+      const hasSeenGuide = await AsyncStorage.getItem('hasSeenAssignmentsGuide');
+
+      if (!hasSeenGuide) {
+        setShowGuide(true);
+      }
+    };
+
+    void checkGuide();
+  }, []);
+
+  const closeGuide = async () => {
+    await AsyncStorage.setItem('hasSeenAssignmentsGuide', 'true');
+    setShowGuide(false);
+  };
+
   const renderRightActions = (id: string) => {
     return (
       <TouchableOpacity
@@ -171,6 +192,7 @@ export default function AddAssignmentScreen() {
         onPress={() => {
           void deleteAssignment(id);
         }}
+        activeOpacity={0.85}
       >
         <Text style={styles.deleteActionText}>Delete</Text>
       </TouchableOpacity>
@@ -184,6 +206,14 @@ export default function AddAssignmentScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <GuideModal
+        visible={showGuide}
+        title="Add and Manage Assignments"
+        message="Create assignments here by choosing a course, due date, and due time. Assignly will organize them on your dashboard and remind you before deadlines."
+        onClose={() => {
+          void closeGuide();
+        }}
+      />
       <Modal
         visible={isCourseModalVisible}
         transparent
@@ -208,6 +238,7 @@ export default function AddAssignmentScreen() {
                   <TouchableOpacity
                     style={styles.courseOption}
                     onPress={() => handleSelectCourse(item.id)}
+                    activeOpacity={0.85}
                   >
                     <View
                       style={[
@@ -224,6 +255,7 @@ export default function AddAssignmentScreen() {
             <TouchableOpacity
               style={styles.modalCloseButton}
               onPress={() => setCourseModalVisible(false)}
+              activeOpacity={0.85}
             >
               <Text style={styles.modalCloseButtonText}>Close</Text>
             </TouchableOpacity>

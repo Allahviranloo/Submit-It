@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,6 +12,10 @@ import { Swipeable } from 'react-native-gesture-handler';
 import { useAppData } from '../../context/AppDataContext';
 import { COLORS } from '../../constants/website-colors';
 import AnimatedCard from '../../components/card-animation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import GuideModal from '../../components/GuideModal';
+
+
 
 const COURSE_COLORS = [
   '#EF4444',
@@ -61,8 +65,35 @@ export default function CoursesScreen() {
     );
   };
 
+  const [showGuide, setShowGuide] = useState(false);
+
+  useEffect(() => {
+    const checkGuide = async () => {
+      const hasSeenGuide = await AsyncStorage.getItem('hasSeenCoursesGuide');
+
+      if (!hasSeenGuide) {
+        setShowGuide(true);
+      }
+    };
+
+    void checkGuide();
+  }, []);
+
+  const closeGuide = async () => {
+    await AsyncStorage.setItem('hasSeenCoursesGuide', 'true');
+    setShowGuide(false);
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
+      <GuideModal
+        visible={showGuide}
+        title="Cpirse Organization"
+        message="Create courses here and assign each one a color. When you add assignments, you can link them to these courses so everything stays organized."
+        onClose={() => {
+          void closeGuide();
+        }}
+      />
       <FlatList
         data={courses}
         keyExtractor={(item) => item.id}
