@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '../constants/website-colors';
+import { BlurView } from 'expo-blur';
 
 type GuideModalProps = {
   visible: boolean;
@@ -18,6 +19,7 @@ export default function GuideModal({
   return (
     <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
+        <BlurView intensity={35} tint="dark" style={StyleSheet.absoluteFill} />
         <View style={styles.card}>
           <Text style={styles.title}>{title}</Text>
           <Text style={styles.message}>{message}</Text>
@@ -34,7 +36,6 @@ export default function GuideModal({
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(17, 24, 39, 0.45)',
     justifyContent: 'center',
     padding: 24,
   },

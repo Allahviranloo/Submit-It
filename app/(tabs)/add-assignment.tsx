@@ -18,6 +18,7 @@ import { COLORS } from '../../constants/website-colors';
 import AnimatedCard from '../../components/card-animation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import GuideModal from '../../components/GuideModal';
+import { BlurView } from 'expo-blur';
 
 export default function AddAssignmentScreen() {
   const { courses, assignments, addAssignment, deleteAssignment } = useAppData();
@@ -224,6 +225,7 @@ export default function AddAssignmentScreen() {
           style={styles.modalOverlay}
           onPress={() => setCourseModalVisible(false)}
         >
+          <BlurView intensity={35} tint="dark" style={StyleSheet.absoluteFill} />
           <Pressable style={styles.modalCard} onPress={() => {}}>
             <Text style={styles.modalTitle}>Select a course</Text>
 
@@ -601,10 +603,10 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     marginTop: 12,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+    shadowOpacity: 0.08,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 4,
   },
   assignmentCardSubmitted: {
     opacity: 0.75,
@@ -663,15 +665,19 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(17, 24, 39, 0.35)',
     justifyContent: 'center',
     padding: 24,
   },
   modalCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 24,
+    padding: 22,
     maxHeight: '70%',
+    shadowColor: '#000',
+    shadowOpacity: 0.12,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 8,
   },
   modalTitle: {
     fontSize: 20,
@@ -690,7 +696,8 @@ const styles = StyleSheet.create({
   courseOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 4,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
   },

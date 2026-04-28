@@ -14,7 +14,7 @@ import { COLORS } from '../../constants/website-colors';
 import AnimatedCard from '../../components/card-animation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import GuideModal from '../../components/GuideModal';
-
+import { BlurView } from 'expo-blur';
 
 
 const COURSE_COLORS = [
