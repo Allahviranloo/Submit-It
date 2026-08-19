@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useAppData } from '../../context/AppDataContext';
 import { COLORS } from '../../constants/website-colors';
+import { getReminderFrequencyLabel } from '../../services/notifications';
 
 export default function AssignmentDetailsScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -109,6 +110,11 @@ export default function AssignmentDetailsScreen() {
         <View style={styles.infoCard}>
           <Text style={styles.label}>Due Time</Text>
           <Text style={styles.value}>{assignment.dueTime}</Text>
+        </View>
+
+        <View style={styles.infoCard}>
+          <Text style={styles.label}>Notification Frequency</Text>
+          <Text style={styles.value}>{getReminderFrequencyLabel(assignment.reminderFrequency)}</Text>
         </View>
 
         <View style={styles.infoCard}>

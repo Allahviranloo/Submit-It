@@ -4,6 +4,29 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const INACTIVITY_NOTIFICATION_KEY = 'smart-planner-inactivity-notification-id';
 
+export type ReminderFrequency = 'once' | 'hourly' | 'every-2-hours' | 'daily' | 'every-2-days' | 'weekly';
+
+export const REMINDER_FREQUENCY_OPTIONS: { value: ReminderFrequency; label: string }[] = [
+  { value: 'once', label: 'Once (24 hours before)' },
+  { value: 'hourly', label: 'Every hour' },
+  { value: 'every-2-hours', label: 'Every 2 hours' },
+  { value: 'daily', label: 'Every day' },
+  { value: 'every-2-days', label: 'Every 2 days' },
+  { value: 'weekly', label: 'Every week' },
+];
+
+const FREQUENCY_SECONDS: Record<Exclude<ReminderFrequency, 'once'>, number> = {
+  hourly: 60 * 60,
+  'every-2-hours': 2 * 60 * 60,
+  daily: 24 * 60 * 60,
+  'every-2-days': 2 * 24 * 60 * 60,
+  weekly: 7 * 24 * 60 * 60,
+};
+
+export function getReminderFrequencyLabel(frequency: ReminderFrequency) {
+  return REMINDER_FREQUENCY_OPTIONS.find((option) => option.value === frequency)?.label ?? 'Once';
+}
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowBanner: true,
@@ -60,12 +83,61 @@ export async function scheduleAssignmentReminderNotification(params: {
   assignmentTitle: string;
   dueDate: string;
   dueTime: string;
+  frequency: ReminderFrequency;
 }) {
   const now = new Date();
   const dueDateTime = buildDueDateTime(params.dueDate, params.dueTime);
 
   if (dueDateTime <= now) {
-    return null;
+    return [];
+  }
+
+  if (params.frequency !== 'once') {
+    const intervalMs = FREQUENCY_SECONDS[params.frequency] * 1000;
+    const notificationIds: string[] = [];
+    // iOS keeps a limited number of pending local notifications. Leave room for
+    // general reminders and the inactivity reminder.
+    const maximumNotifications = 50;
+
+    for (
+      let triggerTime = now.getTime() + intervalMs;
+      triggerTime < dueDateTime.getTime() && notificationIds.length < maximumNotifications;
+      triggerTime += intervalMs
+    ) {
+      const id = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Assignment reminder',
+          body: `Your ${params.courseName} assignment “${params.assignmentTitle}” is due ${params.dueDate} at ${params.dueTime}.`,
+          data: { type: 'assignment-reminder' },
+          sound: true,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: new Date(triggerTime),
+          channelId: Platform.OS === 'android' ? 'default' : undefined,
+        },
+      });
+      notificationIds.push(id);
+    }
+
+    if (notificationIds.length === 0) {
+      const id = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Assignment reminder',
+          body: `Your ${params.courseName} assignment “${params.assignmentTitle}” is due soon at ${params.dueTime}.`,
+          data: { type: 'assignment-reminder' },
+          sound: true,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: new Date(now.getTime() + 60 * 1000),
+          channelId: Platform.OS === 'android' ? 'default' : undefined,
+        },
+      });
+      notificationIds.push(id);
+    }
+
+    return notificationIds;
   }
 
   let triggerDate = new Date(dueDateTime.getTime() - 24 * 60 * 60 * 1000);
@@ -92,17 +164,68 @@ export async function scheduleAssignmentReminderNotification(params: {
     },
   });
 
-  return id;
+  return [id];
 }
 
-export async function cancelScheduledNotification(notificationId?: string | null) {
-  if (!notificationId) return;
-  try {
-    await Notifications.cancelScheduledNotificationAsync(notificationId);
-  } catch {
-    // ignore missing/dead IDs
+export async function scheduleGeneralReminderNotification(params: {
+  title: string;
+  reminderDate: string;
+  reminderTime: string;
+  frequency: ReminderFrequency;
+}) {
+  const startDate = buildDueDateTime(params.reminderDate, params.reminderTime);
+  if (startDate <= new Date()) return [];
+
+  const content = {
+    title: 'Reminder',
+    body: params.title,
+    data: { type: 'general-reminder' },
+    sound: true,
+  };
+
+  if (params.frequency === 'once') {
+    const id = await Notifications.scheduleNotificationAsync({
+      content,
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: startDate,
+        channelId: Platform.OS === 'android' ? 'default' : undefined,
+      },
+    });
+    return [id];
   }
+
+  const intervalMs = FREQUENCY_SECONDS[params.frequency] * 1000;
+  const notificationIds: string[] = [];
+  // Schedule from the user's chosen first-alert time. A bounded queue avoids
+  // exceeding iOS's pending-local-notification limit.
+  for (let triggerTime = startDate.getTime(); notificationIds.length < 50; triggerTime += intervalMs) {
+    const id = await Notifications.scheduleNotificationAsync({
+      content,
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: new Date(triggerTime),
+        channelId: Platform.OS === 'android' ? 'default' : undefined,
+      },
+    });
+    notificationIds.push(id);
+  }
+  return notificationIds;
 }
+
+export async function cancelScheduledNotifications(notificationIds?: string[] | string | null) {
+  if (!notificationIds) return;
+  const ids = Array.isArray(notificationIds) ? notificationIds : [notificationIds];
+  await Promise.all(ids.map(async (id) => {
+    try {
+      await Notifications.cancelScheduledNotificationAsync(id);
+    } catch {
+      // Ignore notification IDs that have already fired or been removed.
+    }
+  }));
+}
+
+export const cancelScheduledNotification = cancelScheduledNotifications;
 
 export async function scheduleInactivityReminderNotification() {
   const existingId = await AsyncStorage.getItem(INACTIVITY_NOTIFICATION_KEY);

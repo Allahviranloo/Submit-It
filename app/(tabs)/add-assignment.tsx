@@ -19,6 +19,10 @@ import AnimatedCard from '../../components/card-animation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import GuideModal from '../../components/GuideModal';
 import { BlurView } from 'expo-blur';
+import {
+  REMINDER_FREQUENCY_OPTIONS,
+  ReminderFrequency,
+} from '../../services/notifications';
 
 export default function AddAssignmentScreen() {
   const { courses, assignments, addAssignment, deleteAssignment } = useAppData();
@@ -26,6 +30,7 @@ export default function AddAssignmentScreen() {
   const [title, setTitle] = useState('');
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [description, setDescription] = useState('');
+  const [reminderFrequency, setReminderFrequency] = useState<ReminderFrequency>('once');
 
   const [selectedDateObject, setSelectedDateObject] = useState(new Date());
   const [dueDate, setDueDate] = useState(formatDate(new Date()));
@@ -128,13 +133,14 @@ export default function AddAssignmentScreen() {
       return;
     }
 
-    await addAssignment(title, selectedCourseId, dueDate, dueTime, description);
+    await addAssignment(title, selectedCourseId, dueDate, dueTime, description, reminderFrequency);
 
     const resetDate = new Date();
 
     setTitle('');
     setSelectedCourseId('');
     setDescription('');
+    setReminderFrequency('once');
     setSelectedDateObject(resetDate);
     setDueDate(formatDate(resetDate));
     setDueTime(formatTime(resetDate));
@@ -345,6 +351,30 @@ export default function AddAssignmentScreen() {
               />
 
               <View style={styles.formGroup}>
+                <Text style={styles.label}>Notify Me</Text>
+                <View style={styles.frequencyGrid}>
+                  {REMINDER_FREQUENCY_OPTIONS.map((option) => (
+                    <TouchableOpacity
+                      key={option.value}
+                      style={[
+                        styles.frequencyOption,
+                        reminderFrequency === option.value && styles.frequencyOptionSelected,
+                      ]}
+                      onPress={() => setReminderFrequency(option.value)}
+                    >
+                      <Text style={[
+                        styles.frequencyOptionText,
+                        reminderFrequency === option.value && styles.frequencyOptionTextSelected,
+                      ]}>
+                        {option.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <Text style={styles.helperText}>Repeated assignment alerts stop at the due time or when you mark it submitted.</Text>
+              </View>
+
+              <View style={styles.formGroup}>
                 <Text style={styles.label}>Description</Text>
                 <TextInput
                   style={[styles.input, styles.textArea]}
@@ -535,6 +565,37 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 100,
     textAlignVertical: 'top',
+  },
+  frequencyGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  frequencyOption: {
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.card,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+  },
+  frequencyOptionSelected: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.primarySoft,
+  },
+  frequencyOptionText: {
+    color: COLORS.textSecondary,
+    fontWeight: '600',
+    fontSize: 13,
+  },
+  frequencyOptionTextSelected: {
+    color: COLORS.primary,
+  },
+  helperText: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 8,
   },
   button: {
     backgroundColor: COLORS.primary,
