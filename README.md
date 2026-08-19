@@ -9,6 +9,8 @@ Submit-It is a cross-platform mobile app built with React Native and Expo that h
 - Local reminder notifications
 - Swipe-to-delete interactions
 - Assignment detail view with submitted status
+- General reminders for day to day tasks
+- Ability to define how often notifications appear
 - Persistent local storage with AsyncStorage
 
 ## Tech Stack
