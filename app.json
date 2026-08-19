@@ -4,7 +4,7 @@
     "slug": "Submit-It",
     "version": "1.1.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/Icon.png",
     "scheme": "Submit-It",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
