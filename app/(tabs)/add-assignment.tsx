@@ -51,10 +51,12 @@ export default function AddAssignmentScreen() {
   }
 
   function formatTime(date: Date) {
-    return date.toLocaleTimeString([], {
-      hour: 'numeric',
-      minute: '2-digit',
-    });
+    const hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const modifier = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+
+    return `${displayHours}:${minutes} ${modifier}`;
   }
 
   const parseTimeString = (timeString: string) => {

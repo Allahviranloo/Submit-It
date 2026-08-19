@@ -16,7 +16,14 @@ const formatDate = (date: Date) => {
 
   return `${year}-${month}-${day}`;
 };
-const formatTime = (date: Date) => date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+const formatTime = (date: Date) => {
+  const hours = date.getHours();
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const modifier = hours >= 12 ? 'PM' : 'AM';
+  const displayHours = hours % 12 || 12;
+
+  return `${displayHours}:${minutes} ${modifier}`;
+};
 
 export default function RemindersScreen() {
   const { reminders, addReminder, deleteReminder } = useAppData();
